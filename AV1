@@ -1,0 +1,191 @@
+####################################
+### base de dados SINAN
+### ZIKA AMAZONAS 2016
+### ALUNO: Maria Isabella Luiz da Silva
+### CURSO R PPG
+###################################
+
+# =TAREFAS=
+
+#Aplicar filtro  (apenas casos em residentes diferente de Manaus) check
+#Criar um novo objeto com as variáveis selecionadas; check
+ #- Selecionar pelo menos 5 variaveis + idade.anos* + DATA DE NOTIF); check
+#Remover o objeto com a base de dados completa; ?
+#Manipular a base de dados; 
+ #- reclass as variáveis, recodificar as categorias, renomear alguma variável, criar variável nova para alguma variável categórica e juntar algumas categorias, criar faixa etária, criar variável Mês de notif.
+#Trabalhar com NA - colocar na categoria "Sem informação" check
+#Fazer tabela de freq simples e contingência (usando gtsumamry) - tabela completa com todos os detalhes abordados em aula
+
+
+# mudar dir =OK= (session; set working directory; choose directory)
+
+library(pacman)
+p_load(dplyr, rio, ggplot2, stringr, forcats)
+library(stringr)
+
+
+library(read.dbc) # importar base extensao dbc
+library(stringr) # para trabalhar com string
+
+### esse caminho nao funcionou, entao tive que buscar outros meios de rodar o read.dbc
+### o unico que funcionou foi a instalacao do pacote "microdatasus"
+
+install.packages("devtools") # instala o pacote devtools
+
+devtools::install_github("rfsaldanha/microdatasus")
+
+install.packages("read.dbc")
+
+###
+# Para importar base de dados com extensao .dbc
+##
+
+
+zika <- read.dbc("ZIKAAM16.dbc")
+
+names(zika) # ver nomes das variaveis
+
+
+summary(zika$NU_IDADE_N) #infos idade
+
+# CRIANDO A VARIAVEL idade.anos
+# A VARIAVEL IDADE DA BASE SINAN TEM UMA PARTICULARIDADE (VER DICIONARIO) (variavel composta
+# por 4 caracteres. o primeiro deles indica se a idade é em hora -1-, dia -2-, mes -3- ou ano -4)
+
+zika$cod_idade <- str_sub(zika$NU_IDADE_N, 1, 1) # 1o digito: hora, dia, mes, ano... (essa linha mostra apenas o primeiro caracter. 
+# lendo o comando: a categoria cod_idade dentro do banco zika recebe a retirada de string feita na categoria NU_IDADE. a retirada
+# começa no primeiro caracter e termina no primeiro caracter, ou seja, retira so o primeiro numero da sequencia)
+zika$cod_idade[1:10]
+table(zika$cod_idade)
+
+zika$IDADE.aux <- str_sub(zika$NU_IDADE_N, 2,str_length(zika$NU_IDADE_N)) # idade sem digito - 2o digito em diante =a remocao comeca no segundo
+# digito? pq em alguns aparece 0 a esquerda e em outros nao?)
+zika$IDADE.aux[1:10]
+table(zika$IDADE.aux)
+
+zika$IDADE.aux <- as.character(zika$IDADE.aux)
+zika$IDADE.aux <- as.numeric(zika$IDADE.aux)
+zika$cod_idade <- as.character(zika$cod_idade)
+
+
+# idade em "em anos completos"
+
+# se 1o digito == 4, a idade em anos compeltos é a idade auxiliar, 
+#caso contrario idade em anos completos sera 0
+
+zika$idade.anos <- ifelse(zika$cod_idade == 4, zika$IDADE.aux, 0)
+
+class(zika$idade.anos)
+
+# usar a variavel idade.anos
+boxplot(zika$idade.anos)
+summary(zika$idade.anos)
+
+table(zika$ID_MN_RESI) # para ver os codigos, manaus = 1302603
+
+zika.av <- zika %>% filter(ID_MN_RESI != "130260")
+
+# Error: package or namespace load failed for ‘dplyr’ in loadNamespace(j <- i[[1L]], c(lib.loc, .libPaths()), versionCheck = vI[[j]]): namespace ‘lifecycle’ 1.0.1 is already loaded, but >= 1.0.3 is required
+
+# PaP a seguir para rodar dplyr
+
+remove.packages("rlang")
+install.packages("rlang")
+library(rlang)
+library(dplyr)
+
+#Aplicar filtro  (apenas casos em residentes diferente de Manaus)
+
+zika.av <- zika %>% filter(ID_MN_RESI != "130260")
+
+#Criar um novo objeto com as variáveis selecionadas;
+ # - Selecionar pelo menos 5 variaveis + idade.anos* + DATA DE NOTIF);
+
+zika.av1 <- zika.av %>% select(idade.anos,
+                               DT_NOTIFIC,
+                               CS_SEXO,
+                               CS_GESTANT,
+                               CS_RACA,
+                               CS_ESCOL_N,
+                               CLASSI_FIN)
+
+table(zika.av1$CS_SEXO)
+table(zika.av1$CS_GESTANT)
+table(zika.av1$CS_RACA)
+table(zika.av1$CS_ESCOL_N)
+table(zika.av1$CLASSI_FIN)
+
+
+#Manipular a base de dados; 
+ #- reclass as variáveis, recodificar as categorias, renomear alguma variável, criar variável nova para alguma variável categórica e juntar algumas categorias, criar faixa etária, criar variável Mês de notif.
+
+zika.av1 <- zika.av1 %>% mutate(CS_SEXO = as.factor(CS_SEXO),
+                               CS_GESTANT = as.factor(CS_GESTANT),
+                               CS_RACA = as.factor(CS_RACA),
+                               CS_ESCOL_N = as.factor(CS_ESCOL_N),
+                               CLASSI_FIN = as.factor(CLASSI_FIN))
+
+zika.av1 <- zika.av1 %>% mutate(CS_SEXO = recode(CS_SEXO,
+                                                 "M" = "Masculino",
+                                                 "F" = "Feminino",
+                                                 "I" = "Ignorado"))
+
+zika.av1 <- zika.av1 %>% mutate(CS_GESTANT = recode(CS_GESTANT,
+                                                    "1" = "1º Trimestre",
+                                                    "2" = "2º Trimestre",
+                                                    "3" = "3º Trimestre",
+                                                    "4" = "Idade gestacional ignorada",
+                                                    "5" = "Não",
+                                                    "6" = "Não se aplica",
+                                                    "9" = "Ignorado"))
+                                
+zika.av1 <- zika.av1 %>% mutate(CS_RACA = recode(CS_RACA, 
+                                                 "1" = "Branca",
+                                                 "2" = "Preta",
+                                                 "3" = "Amarela",
+                                                 "4" = "Parda",
+                                                 "5" = "Indígena",
+                                                 "9" = "Ignorado"))
+
+zika.av1 <- zika.av1 %>% mutate(CS_ESCOL_N = recode("0" = "Analfabeto",
+                                                    "1" = "1ª a 4ª série incompleta do EF (antigo primário ou 1º grau)",
+                                                    "2" = "4ª série completa do EF (antigo primário ou 1º grau)",
+                                                    "3" = "5ª à 8ª série incompleta do EF (antigo ginásio ou 1º grau)",
+                                                    "4" = "Ensino fundamental completo (antigo ginásio ou 1º grau)",
+                                                    "5" = "Ensino médio incompleto (antigo colegial ou 2º grau)",
+                                                    "6" = "Ensino médio completo (antigo colegial ou 2º grau)",
+                                                    "7" = "Educação superior incompleta",
+                                                    "8" = "Educação superior completa",
+                                                    "9" = "Ignorado",
+                                                    "10" = "Não se aplica"))
+
+zika.av1 <- zika.av1 %>% mutate(CLASSI_FIN = recode("1" = "Confirmado",
+                                                    "2" - "Descartado"))
+
+zika.av1 <- zika.av1 %>% rename("Idade" = idade.anos,
+                                "Data de notificação" = DT_NOTIFIC,
+                                "Sexo" = CS_SEXO,
+                                "Gestante" = CS_GESTANT,
+                                "Raça" = CS_RACA,
+                                "Escolaridade" = CS_ESCOL_N,
+                                "Classificação final do caso" = CLASSI_FIN)
+
+as.Date(0, origin = "1900-01-01")
+zika.av1$DT_NOTIFIC1 <- mdy(zika.av1$DT_NOTIFIC) 
+
+<- zika.av1 %>% mutate (DT_NOTIFIC = as.Date(DT_NOTIFIC, format = "%d%m%Y"))
+
+nchar(zika.av1$DT_NOTIFIC)
+table(nchar(zika.av1$DT_NOTIFIC))
+
+#Trabalhar com NA - colocar na categoria "Sem informação" 
+
+zika.av1 <- zika.av1 %>% mutate(CS_RACA = fct_explicit_na(CS_RACA, 
+                                                             "Sem informação"))
+
+zika.av1 <- zika.av1 %>% mutate(CS_ESCOL_N = fct_explicit_na(CS_ESCOL_N, 
+                                                             "Sem informação"))
+
+zika.av1 <- zika.av1 %>% mutate(CLASSI_FIN = fct_explicit_na(CLASSI_FIN, 
+                                                             "Sem informação"))
+
