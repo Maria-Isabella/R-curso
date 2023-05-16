@@ -190,3 +190,15 @@ zika.av1 <- zika.av1 %>% mutate (fxet = cut(Idade,
                         breaks = c(0, 20, 40, 60, Inf),
                         right = F) )
 
+
+### TESTAR (consertar "inconclusivo")
+
+zika.av1["RaçaNovo"]<-zika.av1$Raça
+
+zika.av1 <- zika.av1 %>% mutate(RaçaNovo = recode(RaçaNovo, 
+                                                 "1" = "Branca",
+                                                 "2" = "Não branca",
+                                                 "3" = "Não branca",
+                                                 "4" = "Não branca",
+                                                 "5" = "Não branca",
+                                                 "9" = "Ignorado"))
