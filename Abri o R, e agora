@@ -1,0 +1,32 @@
+#### PACOTES PARA TRABALHAR COM R ####
+### carregar pacotes ###
+
+# file -> new file -> rscript
+
+# MANIPULAR DADOS
+
+install.packages("data.table") #manipula grandes qttds de dados
+library(data.table)
+
+install.packages("tidyverse") #manipula dados, baixa dplyr e lubridate
+library(dplyr)
+library(lubridate) #manipula datas
+
+install.packages("tidyr") #limpa e organiza banco
+library(tidyr)
+
+install.packages("knitr") #cria relatorios
+library (knitr)
+
+install.packages("devtools") # instala o pacote devtools
+devtools::install_github("rfsaldanha/microdatasus")
+install.packages("read.dbc")
+library(read.dbc)
+
+install.packages("stringr")
+library(stringr)
+
+
+# GRAFICOS
+install.packages("ggplot2")
+library(ggplot2)
