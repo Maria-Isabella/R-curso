@@ -23,7 +23,6 @@ library(pacman)
 p_load(dplyr, rio, ggplot2, stringr, forcats)
 library(stringr)
 
-
 library(read.dbc) # importar base extensao dbc
 library(stringr) # para trabalhar com string
 
@@ -44,7 +43,6 @@ install.packages("read.dbc")
 zika <- read.dbc("ZIKAAM16.dbc")
 
 names(zika) # ver nomes das variaveis
-
 
 summary(zika$NU_IDADE_N) #infos idade
 
@@ -147,33 +145,24 @@ zika.av1 <- zika.av1 %>% mutate(CS_RACA = recode(CS_RACA,
                                                  "5" = "Indígena",
                                                  "9" = "Ignorado"))
 
-zika.av1 <- zika.av1 %>% mutate(CS_ESCOL_N = recode("0" = "Analfabeto",
-                                                    "1" = "1ª a 4ª série incompleta do EF (antigo primário ou 1º grau)",
-                                                    "2" = "4ª série completa do EF (antigo primário ou 1º grau)",
-                                                    "3" = "5ª à 8ª série incompleta do EF (antigo ginásio ou 1º grau)",
-                                                    "4" = "Ensino fundamental completo (antigo ginásio ou 1º grau)",
-                                                    "5" = "Ensino médio incompleto (antigo colegial ou 2º grau)",
-                                                    "6" = "Ensino médio completo (antigo colegial ou 2º grau)",
-                                                    "7" = "Educação superior incompleta",
-                                                    "8" = "Educação superior completa",
-                                                    "9" = "Ignorado",
+zika.av1 <- zika.av1 %>% mutate(CS_ESCOL_N = recode(CS_ESCOL_N,
+                                                    "00" = "Analfabeto",
+                                                    "01" = "1ª a 4ª série incompleta do EF (antigo primário ou 1º grau)",
+                                                    "02" = "4ª série completa do EF (antigo primário ou 1º grau)",
+                                                    "03" = "5ª à 8ª série incompleta do EF (antigo ginásio ou 1º grau)",
+                                                    "04" = "Ensino fundamental completo (antigo ginásio ou 1º grau)",
+                                                    "05" = "Ensino médio incompleto (antigo colegial ou 2º grau)",
+                                                    "06" = "Ensino médio completo (antigo colegial ou 2º grau)",
+                                                    "07" = "Educação superior incompleta",
+                                                    "08" = "Educação superior completa",
+                                                    "09" = "Ignorado",
                                                     "10" = "Não se aplica"))
 
-zika.av1 <- zika.av1 %>% mutate(CLASSI_FIN = recode("1" = "Confirmado",
-                                                    "2" - "Descartado"))
+zika.av1 <- zika.av1 %>% mutate(CLASSI_FIN = recode(CLASSI_FIN,
+                                                    "1" = "Confirmado",
+                                                    "2" = "Descartado",
+                                                    "8" = "Incloncusivo"))
 
-zika.av1 <- zika.av1 %>% rename("Idade" = idade.anos,
-                                "Data de notificação" = DT_NOTIFIC,
-                                "Sexo" = CS_SEXO,
-                                "Gestante" = CS_GESTANT,
-                                "Raça" = CS_RACA,
-                                "Escolaridade" = CS_ESCOL_N,
-                                "Classificação final do caso" = CLASSI_FIN)
-
-as.Date(0, origin = "1900-01-01")
-zika.av1$DT_NOTIFIC1 <- mdy(zika.av1$DT_NOTIFIC) 
-
-<- zika.av1 %>% mutate (DT_NOTIFIC = as.Date(DT_NOTIFIC, format = "%d%m%Y"))
 
 nchar(zika.av1$DT_NOTIFIC)
 table(nchar(zika.av1$DT_NOTIFIC))
@@ -188,4 +177,16 @@ zika.av1 <- zika.av1 %>% mutate(CS_ESCOL_N = fct_explicit_na(CS_ESCOL_N,
 
 zika.av1 <- zika.av1 %>% mutate(CLASSI_FIN = fct_explicit_na(CLASSI_FIN, 
                                                              "Sem informação"))
+
+zika.av1 <- zika.av1 %>% rename("Idade" = idade.anos,
+                                "Data de notificação" = DT_NOTIFIC,
+                                "Sexo" = CS_SEXO,
+                                "Gestante" = CS_GESTANT,
+                                "Raça" = CS_RACA,
+                                "Escolaridade" = CS_ESCOL_N,
+                                "Classificação final do caso" = CLASSI_FIN)
+
+zika.av1 <- zika.av1 %>% mutate (fxet = cut(Idade,
+                        breaks = c(0, 20, 40, 60, Inf),
+                        right = F) )
 
