@@ -202,3 +202,67 @@ zika.av1 <- zika.av1 %>% mutate(RaçaNovo = recode(RaçaNovo,
                                                  "4" = "Não branca",
                                                  "5" = "Não branca",
                                                  "9" = "Ignorado"))
+
+
+dados %>% 
+  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
+   tbl_summary() %>%
+    modify_header(label ~ "*Variáveis*") %>% # muda o cabeçalho da 1a coluna
+     modify_caption("**Tabela 1. Características dos óbitos por Neoplasia maligna da mama,
+                   não especificada, em mulheres, MRJ 2020**")  # titulo
+select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
+  tbl_summary( statistic = list(all_continuous() ~ "{mean} ({sd})"), # media e desvio
+               digits = all_categorical() ~ c(0,1),          
+               label = list(ESTCIV ~ "*Estado Civil*",
+                            RACA.novo ~ "*Cor da pele*",
+                            ESC2010 ~ "*Escolaridade 2010*",
+                            LOCOCOR ~ "*Local de ocorrencia do obito*",
+                            IDADE.anos ~ "*Idade*"
+                            fxet ~ "*Faixa etaria*"))
+
+#Média e desvio
+dados %>% 
+  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
+  tbl_summary( statistic = list(all_continuous() ~ "{mean} ({sd})"), # media e desvio
+               digits = all_categorical() ~ c(0,1),          
+               label = list(ESTCIV ~ "*Estado Civil*",
+                            RACA.novo ~ "*Cor da pele*",
+                            ESC2010 ~ "*Escolaridade 2010*",
+                            LOCOCOR ~ "*Local de ocorrencia do obito*",
+                            IDADE.anos ~ "*Idade*",
+                            fxet ~ "*Faixa etaria*"))
+
+# fazer tabela COMPLETA  - titulo, mudar cabeçalho, colocar o nome de todas as variaveis (olhar dicionario)
+# % com 1 digito, media e DP
+# desafio: colocar nome das variaveis em negrito
+
+dados %>% 
+  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
+  tbl_summary( statistic = list(all_continuous() ~ "{mean} ({sd})"), # media e desvio
+               digits = all_categorical() ~ c(0,1),          
+               label = list(ESTCIV ~ "Estado Civil",
+                            RACA.novo ~ "Cor da pele",
+                            ESC2010 ~ "Escolaridade 2010",
+                            LOCOCOR ~ "Local de ocorrencia do obito",
+                            IDADE.anos ~ "Idade",
+                            fxet ~ "Faixa etaria"))%>%
+  bold_labels()%>%
+  modify_header(label ~ "*Variáveis*") %>% # muda o cabeçalho da 1a coluna
+  modify_caption("**Tabela 1. Características dos óbitos por Neoplasia maligna da mama,
+                   não especificada, em mulheres, MRJ 2020**")  # titulo
+
+######## TABELA DE CONTINGENCIA
+# "desfecho" = raca
+
+dados %>% 
+  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
+   tbl_summary(by = RACA.novo)
+
+
+# tabela com mais detalhes
+dados %>% 
+  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
+  tbl_summary(by = RACA.novo) %>%
+  add_p(pvalue_fun = ~ style_pvalue(.x, digits = 2)) %>% # pvalor
+  add_overall( col_label = "*Total*") %>% # coluna de total - 
+  modify_spanning_header(c("stat_1", "stat_2", "stat_3") ~ "*Cor da pele*")
