@@ -5,6 +5,9 @@
 
 # MANIPULAR DADOS
 
+install.packages("readr") #importar e exportar arquivos
+library(readr)
+
 install.packages("data.table") #manipula grandes qttds de dados
 library(data.table)
 
