@@ -1,18 +1,18 @@
-####################################
-### base de dados SINAN
-### ZIKA AMAZONAS 2016
-### ALUNO: Maria Isabella Luiz da Silva
-### CURSO R PPG
-###################################
+########################################
+# base de dados SINAN                  #
+# ZIKA AMAZONAS 2016                   #
+# ALUNO: Maria Isabella Luiz da Silva  #
+# CURSO R PPG                          #
+########################################
 
 # =TAREFAS=
 
 #Aplicar filtro  (apenas casos em residentes diferente de Manaus) check
 #Criar um novo objeto com as variáveis selecionadas; check
- #- Selecionar pelo menos 5 variaveis + idade.anos* + DATA DE NOTIF); check
+#- Selecionar pelo menos 5 variaveis + idade.anos* + DATA DE NOTIF); check
 #Remover o objeto com a base de dados completa; ?
 #Manipular a base de dados; 
- #- reclass as variáveis, recodificar as categorias, renomear alguma variável, criar variável nova para alguma variável categórica e juntar algumas categorias, criar faixa etária, criar variável Mês de notif.
+#- reclass as variáveis, recodificar as categorias, renomear alguma variável, criar variável nova para alguma variável categórica e juntar algumas categorias, criar faixa etária, criar variável Mês de notif.
 #Trabalhar com NA - colocar na categoria "Sem informação" check
 #Fazer tabela de freq simples e contingência (usando gtsumamry) - tabela completa com todos os detalhes abordados em aula
 
@@ -35,9 +35,9 @@ devtools::install_github("rfsaldanha/microdatasus")
 
 install.packages("read.dbc")
 
-###
-# Para importar base de dados com extensao .dbc
-##
+################################################
+# Para importar base de dados com extensao .dbc#
+################################################
 
 
 zika <- read.dbc("ZIKAAM16.dbc")
@@ -66,10 +66,10 @@ zika$IDADE.aux <- as.numeric(zika$IDADE.aux)
 zika$cod_idade <- as.character(zika$cod_idade)
 
 
-# idade em "em anos completos"
+# idade "em anos completos"
 
 # se 1o digito == 4, a idade em anos compeltos é a idade auxiliar, 
-#caso contrario idade em anos completos sera 0
+# caso contrario idade em anos completos sera 0
 
 zika$idade.anos <- ifelse(zika$cod_idade == 4, zika$IDADE.aux, 0)
 
@@ -79,7 +79,7 @@ class(zika$idade.anos)
 boxplot(zika$idade.anos)
 summary(zika$idade.anos)
 
-table(zika$ID_MN_RESI) # para ver os codigos, manaus = 1302603
+table(zika$ID_MN_RESI) # para ver os codigos, Manaus = 1302603
 
 zika.av <- zika %>% filter(ID_MN_RESI != "130260")
 
@@ -97,7 +97,7 @@ library(dplyr)
 zika.av <- zika %>% filter(ID_MN_RESI != "130260")
 
 #Criar um novo objeto com as variáveis selecionadas;
- # - Selecionar pelo menos 5 variaveis + idade.anos* + DATA DE NOTIF);
+# - Selecionar pelo menos 5 variaveis + idade.anos* + DATA DE NOTIF);
 
 zika.av1 <- zika.av %>% select(idade.anos,
                                DT_NOTIFIC,
@@ -115,13 +115,13 @@ table(zika.av1$CLASSI_FIN)
 
 
 #Manipular a base de dados; 
- #- reclass as variáveis, recodificar as categorias, renomear alguma variável, criar variável nova para alguma variável categórica e juntar algumas categorias, criar faixa etária, criar variável Mês de notif.
+#- reclass as variáveis, recodificar as categorias, renomear alguma variável, criar variável nova para alguma variável categórica e juntar algumas categorias, criar faixa etária, criar variável Mês de notif.
 
 zika.av1 <- zika.av1 %>% mutate(CS_SEXO = as.factor(CS_SEXO),
-                               CS_GESTANT = as.factor(CS_GESTANT),
-                               CS_RACA = as.factor(CS_RACA),
-                               CS_ESCOL_N = as.factor(CS_ESCOL_N),
-                               CLASSI_FIN = as.factor(CLASSI_FIN))
+                                CS_GESTANT = as.factor(CS_GESTANT),
+                                CS_RACA = as.factor(CS_RACA),
+                                CS_ESCOL_N = as.factor(CS_ESCOL_N),
+                                CLASSI_FIN = as.factor(CLASSI_FIN))
 
 zika.av1 <- zika.av1 %>% mutate(CS_SEXO = recode(CS_SEXO,
                                                  "M" = "Masculino",
@@ -136,7 +136,7 @@ zika.av1 <- zika.av1 %>% mutate(CS_GESTANT = recode(CS_GESTANT,
                                                     "5" = "Não",
                                                     "6" = "Não se aplica",
                                                     "9" = "Ignorado"))
-                                
+
 zika.av1 <- zika.av1 %>% mutate(CS_RACA = recode(CS_RACA, 
                                                  "1" = "Branca",
                                                  "2" = "Preta",
@@ -161,16 +161,12 @@ zika.av1 <- zika.av1 %>% mutate(CS_ESCOL_N = recode(CS_ESCOL_N,
 zika.av1 <- zika.av1 %>% mutate(CLASSI_FIN = recode(CLASSI_FIN,
                                                     "1" = "Confirmado",
                                                     "2" = "Descartado",
-                                                    "8" = "Incloncusivo"))
-
-
-nchar(zika.av1$DT_NOTIFIC)
-table(nchar(zika.av1$DT_NOTIFIC))
+                                                    "8" = "Inconclusivo"))
 
 #Trabalhar com NA - colocar na categoria "Sem informação" 
 
 zika.av1 <- zika.av1 %>% mutate(CS_RACA = fct_explicit_na(CS_RACA, 
-                                                             "Sem informação"))
+                                                          "Sem informação"))
 
 zika.av1 <- zika.av1 %>% mutate(CS_ESCOL_N = fct_explicit_na(CS_ESCOL_N, 
                                                              "Sem informação"))
@@ -178,91 +174,74 @@ zika.av1 <- zika.av1 %>% mutate(CS_ESCOL_N = fct_explicit_na(CS_ESCOL_N,
 zika.av1 <- zika.av1 %>% mutate(CLASSI_FIN = fct_explicit_na(CLASSI_FIN, 
                                                              "Sem informação"))
 
+#Criar faixa etaria 
+
+zika.av1 <- zika.av1 %>% mutate (fxet = cut(idade.anos,
+                                            breaks = c(0, 20, 40, 60, Inf),
+                                            right = F) )
+
+#Renomear variaveis
+
 zika.av1 <- zika.av1 %>% rename("Idade" = idade.anos,
-                                "Data de notificação" = DT_NOTIFIC,
+                                "DataNotific" = DT_NOTIFIC,
                                 "Sexo" = CS_SEXO,
                                 "Gestante" = CS_GESTANT,
                                 "Raça" = CS_RACA,
                                 "Escolaridade" = CS_ESCOL_N,
-                                "Classificação final do caso" = CLASSI_FIN)
+                                "ClassiFinCaso" = CLASSI_FIN)
 
-zika.av1 <- zika.av1 %>% mutate (fxet = cut(Idade,
-                        breaks = c(0, 20, 40, 60, Inf),
-                        right = F) )
-
-
-### TESTAR (consertar "inconclusivo")
+#criar nova variavel categorizada - dificuldades em usar case_when
 
 zika.av1["RaçaNovo"]<-zika.av1$Raça
 
 zika.av1 <- zika.av1 %>% mutate(RaçaNovo = recode(RaçaNovo, 
-                                                 "1" = "Branca",
-                                                 "2" = "Não branca",
-                                                 "3" = "Não branca",
-                                                 "4" = "Não branca",
-                                                 "5" = "Não branca",
-                                                 "9" = "Ignorado"))
+                                                  "Branca" = "Branca",
+                                                  "Preta" = "Não branca",
+                                                  "Amarela" = "Não branca",
+                                                  "Parda" = "Não branca",
+                                                  "Indígena" = "Não branca",
+                                                  "Ignorado" = "Ignorado"))
 
+#Adaptando a data (funcionou no banco .xlsx - 10 caracteres no banco .xlsx, veio com - na escrita; no banco .dbc eram 5 caracteres) e criando mes de notificacao
 
-dados %>% 
-  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
-   tbl_summary() %>%
-    modify_header(label ~ "*Variáveis*") %>% # muda o cabeçalho da 1a coluna
-     modify_caption("**Tabela 1. Características dos óbitos por Neoplasia maligna da mama,
-                   não especificada, em mulheres, MRJ 2020**")  # titulo
-select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
-  tbl_summary( statistic = list(all_continuous() ~ "{mean} ({sd})"), # media e desvio
-               digits = all_categorical() ~ c(0,1),          
-               label = list(ESTCIV ~ "*Estado Civil*",
-                            RACA.novo ~ "*Cor da pele*",
-                            ESC2010 ~ "*Escolaridade 2010*",
-                            LOCOCOR ~ "*Local de ocorrencia do obito*",
-                            IDADE.anos ~ "*Idade*"
-                            fxet ~ "*Faixa etaria*"))
+nchar(zika.av1$DataNotific)
+table(nchar(zika.av1$DataNotific))
+zika.av1$DataNotific
+zika.av1 <- zika.av1 %>% mutate (DataNotific = as.Date(DataNotific, format = "%d-%m-%Y"))
+zika.av1$DataNotific
 
-#Média e desvio
-dados %>% 
-  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
-  tbl_summary( statistic = list(all_continuous() ~ "{mean} ({sd})"), # media e desvio
-               digits = all_categorical() ~ c(0,1),          
-               label = list(ESTCIV ~ "*Estado Civil*",
-                            RACA.novo ~ "*Cor da pele*",
-                            ESC2010 ~ "*Escolaridade 2010*",
-                            LOCOCOR ~ "*Local de ocorrencia do obito*",
-                            IDADE.anos ~ "*Idade*",
-                            fxet ~ "*Faixa etaria*"))
+zika.av1 <- zika.av1 %>% mutate (MesNot = month(DataNotific))
 
-# fazer tabela COMPLETA  - titulo, mudar cabeçalho, colocar o nome de todas as variaveis (olhar dicionario)
-# % com 1 digito, media e DP
-# desafio: colocar nome das variaveis em negrito
+#TABELAS
 
-dados %>% 
-  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
-  tbl_summary( statistic = list(all_continuous() ~ "{mean} ({sd})"), # media e desvio
-               digits = all_categorical() ~ c(0,1),          
-               label = list(ESTCIV ~ "Estado Civil",
-                            RACA.novo ~ "Cor da pele",
-                            ESC2010 ~ "Escolaridade 2010",
-                            LOCOCOR ~ "Local de ocorrencia do obito",
-                            IDADE.anos ~ "Idade",
-                            fxet ~ "Faixa etaria"))%>%
-  bold_labels()%>%
-  modify_header(label ~ "*Variáveis*") %>% # muda o cabeçalho da 1a coluna
-  modify_caption("**Tabela 1. Características dos óbitos por Neoplasia maligna da mama,
-                   não especificada, em mulheres, MRJ 2020**")  # titulo
+#frequencia simples
 
-######## TABELA DE CONTINGENCIA
-# "desfecho" = raca
+zika.av1 %>% 
+  select("Sexo", "Gestante", "Raça", "Escolaridade", "ClassiFinCaso", "fxet") %>%
+  tbl_summary() %>%
+  modify_header(label ~ "*Variáveis*") %>% # muda o cabeçalho da 1a coluna
+  modify_caption("**Tabela 1. Características dos casos diagnosticados com zika, Amazonas, 2016**") # titulo
+select("Sexo", "Gestante", "Raça", "Escolaridade", "ClassiFinCaso", "fxet") %>%
+  tbl_summary( statistic = list(all_continuous() ~ "{mean} ({sd})"), # media e desvio
+               digits = all_categorical() ~ c(0,1), 
+               label = list(Sexo ~ "*Sexo*",
+                            Gestante ~ "*Gestante*",
+                            Raça ~ "*Raça*",
+                            Escolaridade ~ "*Escolaridade*",
+                            ClassiFinCaso ~ "*Classificação Final do Caso*",
+                            fxet ~ "*Faixa etária*"))
 
-dados %>% 
-  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
-   tbl_summary(by = RACA.novo)
+# contingencia - "desfecho" = raca
 
-
-# tabela com mais detalhes
-dados %>% 
-  select("ESTCIV", "ESC2010", "LOCOCOR", "IDADE.anos", "RACA.novo", "fxet") %>%
-  tbl_summary(by = RACA.novo) %>%
-  add_p(pvalue_fun = ~ style_pvalue(.x, digits = 2)) %>% # pvalor
-  add_overall( col_label = "*Total*") %>% # coluna de total - 
-  modify_spanning_header(c("stat_1", "stat_2", "stat_3") ~ "*Cor da pele*")
+zika.av1 %>% 
+  select("Sexo", "Gestante", "Raça", "Escolaridade", "ClassiFinCaso", "fxet") %>%
+  tbl_summary(by = Raça,
+              label = list(Sexo ~ "*Sexo*",
+                           Gestante ~ "*Gestante*",
+                           Raça ~ "*Raça*",
+                           Escolaridade ~ "*Escolaridade*",
+                           ClassiFinCaso ~ "*Classificação Final do Caso*",
+                           fxet ~ "*Faixa etária*")) %>%
+  add_p(pvalue_fun = ~ style_pvalue(.x, digits = 2)) %>% # pvalor
+  add_overall( col_label = "*Total*") %>% # coluna de total - 
+  modify_spanning_header(c("stat_1", "stat_2", "stat_3", "stat_4", "stat_5", "stat_6") ~ "*Cor da pele*")
