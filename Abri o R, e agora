@@ -1,7 +1,15 @@
+### BAIXANDO O R ###
+## PESQUISAR RCRAN 
+## DOWNLOAD R FOR WINDOWS
+# CLICAR EM base E EM Rtools PARA FAZER O DOWNLOAD DO R E DO PACOTE RTOOLS, PROCURAR SEMPRE USAR TODAS AS VERSÕES IGUAIS (R, Rstudio e Rtools)
+# PESQUISAR POR Rstudio ASSIM QUE OS DOIS FOREM BAIXADOS, CLICAR NO DOWNLOAD DESKTOP POSIT E BAIXAR
+
 #### PACOTES PARA TRABALHAR COM R ####
 ### carregar pacotes ###
 
 # file -> new file -> rscript
+install.packages() # seleciona os pacotes que deseja instalar
+library() # "chama o pacote"
 
 # MANIPULAR DADOS
 
